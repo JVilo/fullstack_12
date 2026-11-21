@@ -1,4 +1,5 @@
 /data/db
+redis_data
 # Logs
 logs
 *.log
