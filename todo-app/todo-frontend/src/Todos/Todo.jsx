@@ -23,7 +23,7 @@ const Todo = ({ todo, deleteTodo, completeTodo }) => {
     <>
       <span>This todo is not done</span>
       <span>
-        <button onClick={onClickDelete}>Delete</button>
+        <button style={{ backgroundColor: 'lightcoral' }} onClick={onClickDelete}>Delete</button>
         <button onClick={onClickComplete}>Set as done</button>
       </span>
     </>
