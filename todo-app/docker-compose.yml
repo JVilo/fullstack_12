@@ -30,7 +30,7 @@ services:
 
   redis:
     image: redis
-    command: ['redis-backend', '--appendonly', 'yes']
+    command: ['redis-server', '--appendonly', 'yes']
     volumes:
       - ./todo-backend/redis_data:/data
 
