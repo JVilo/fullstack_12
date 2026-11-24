@@ -1,12 +1,39 @@
 import { render, screen } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MemoryRouter } from 'react-router-dom'
+import { NotificationContextProvider } from '../NotificationContext'
+import { useUser } from '../UserContext'
 import Blog from './Blog'
+
+vi.mock('../UserContext', () => ({
+  useUser: vi.fn(),
+}))
+
+const renderBlog = (ui) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  })
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <NotificationContextProvider>
+        <MemoryRouter>{ui}</MemoryRouter>
+      </NotificationContextProvider>
+    </QueryClientProvider>
+  )
+}
 
 describe('<Blog />', () => {
   const blog = {
+    id: '1',
     title: 'Testing React Components',
     author: 'Test Author',
     url: 'https://react-testing.com',
     likes: 10,
+    comments: [],
     user: {
       username: 'mluukkai',
       name: 'Matti Luukkainen',
@@ -14,7 +41,8 @@ describe('<Blog />', () => {
   }
 
   test('renders blog details and likes for unauthenticated user, but no buttons', () => {
-    render(<Blog blog={blog} user={null} />)
+    useUser.mockReturnValue(null)
+    renderBlog(<Blog blog={blog} />)
 
     expect(
       screen.getByText('Testing React Components', { exact: false })
@@ -25,38 +53,38 @@ describe('<Blog />', () => {
     ).toBeDefined()
     expect(screen.getByText('10 likes', { exact: false })).toBeDefined()
 
-    // Haetaan painikkeita roolin mukaan, jolloin "10 likes" -tekstiä ei lasketa mukaan
-    const likeButton = screen.queryByRole('button', { name: /like/i })
-    const removeButton = screen.queryByRole('button', { name: /remove/i })
+    const likeButton = screen.queryByRole('button', { name: /^like$/i })
+    const removeButton = screen.queryByRole('button', { name: /^remove$/i })
 
     expect(likeButton).toBeNull()
     expect(removeButton).toBeNull()
   })
 
   test('renders only like button for logged in user who is not the creator', () => {
-    const otherUser = {
+    useUser.mockReturnValue({
       username: 'otheruser',
       name: 'Other User',
-    }
+    })
 
-    render(<Blog blog={blog} user={otherUser} />)
+    renderBlog(<Blog blog={blog} />)
 
-    const likeButton = screen.getByRole('button', { name: /like/i })
+    const likeButton = screen.getByRole('button', { name: /^like$/i })
     expect(likeButton).toBeDefined()
 
-    const removeButton = screen.queryByRole('button', { name: /remove/i })
+    const removeButton = screen.queryByRole('button', { name: /^remove$/i })
     expect(removeButton).toBeNull()
   })
 
   test('renders both like and remove buttons for creator of the blog', () => {
-    const creatorUser = {
+    useUser.mockReturnValue({
       username: 'mluukkai',
       name: 'Matti Luukkainen',
-    }
+    })
 
-    render(<Blog blog={blog} user={creatorUser} />)
-    const likeButton = screen.getByRole('button', { name: /like/i })
-    const removeButton = screen.getByRole('button', { name: /remove/i })
+    renderBlog(<Blog blog={blog} />)
+
+    const likeButton = screen.getByRole('button', { name: /^like$/i })
+    const removeButton = screen.getByRole('button', { name: /^remove$/i })
 
     expect(likeButton).toBeDefined()
     expect(removeButton).toBeDefined()
