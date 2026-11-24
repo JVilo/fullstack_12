@@ -1,0 +1,24 @@
+{
+  "name": "bloglist",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm run build --prefix frontend",
+    "start": "NODE_ENV=production npm start --prefix backend",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^10.0.5",
+    "prettier": "3.9.9"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.104.1"
+  }
+}
