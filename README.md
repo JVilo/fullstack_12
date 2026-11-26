@@ -1,1 +1,1 @@
-[my-app](./my-app)
+[my-app](https://github.com/JVilo/fullstack_12/tree/main/my-app)
